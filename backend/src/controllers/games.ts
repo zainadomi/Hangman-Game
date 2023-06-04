@@ -4,6 +4,7 @@ import { assertIsDefined } from '../util/assertIsDefined';
 import { UserRequest } from './types';
 import createHttpError from "http-errors";
 import mongoose from "mongoose";
+import { generateWord } from '../network/word';
 
 
 
@@ -63,35 +64,62 @@ export const getGame: any = async (req:UserRequest,res:Response,next:NextFunctio
 export const createGame:any = async (req:UserRequest,res:Response,next:NextFunction) => {
 
     const wordLength = req.params.wordLength;
-    const authenticatedUserId = req.userId; 
-    // const word = req.body.word;
-    // const guesses = req.body.guesses;
-    // const correctGuesses = req.body.correctGuesses;
-    // const incorrectGuesses = req.body.incorrectGuesses;
-    // const remainingGuesses = req.body.remainingGuesses;
-    // const isActive = req.body.isActive;
-
+    const authenticatedUserId = req.userId;
+    const word = await generateWord(parseInt(wordLength));
+    
     try{
 
         assertIsDefined(authenticatedUserId);
-
         if(!wordLength){
             throw createHttpError(400, 'You must select a wordLength')
         }
-        
+
         const newGame = await GameModel.create({
-                // userId:authenticatedUserId,
-                // wordLength:wordLength,
-                // word:word,
-                // guesses:guesses,
-                // correctGuesses:correctGuesses,
-                // incorrectGuesses:incorrectGuesses,
-                // remainingGuesses:remainingGuesses,
+                userId:authenticatedUserId,
+                wordLength:wordLength,
+                word:word,
+                guesses:[],
+                // correctGuesses:[],
+                // incorrectGuesses:[],
+                // remainingGuesses:5,
                 // isActive:true,
         });
 
-        res.status(201).json(newGame); 
+        res.status(201).json(newGame.word); 
 
+    }catch(error){
+        next(error);
+    }
+}
+
+// Guess letter 
+
+export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunction) => {
+
+    const {letter,id} = req.body;
+    
+    try{
+
+        const game = await GameModel.findById(id).exec();
+        if(!game){
+            throw createHttpError("Game not found");
+        }
+        const word = game.word;
+        const index = word.indexOf(letter);
+        if (index == -1){
+            game.incorrectGuesses.push(letter);
+            game.remainingGuesses--;
+        }else {
+            game.correctGuesses.push(letter);
+            const gameStatus = await game.save();
+            const gameOver = gameStatus.remainingGuesses == 0;
+            const winGame = gameStatus.correctGuesses.length == word.length;
+            res.status(201).json({
+                letter:letter,
+                winGame:winGame,
+                gameOver:gameOver,
+            });
+        }
     }catch(error){
         next(error);
     }

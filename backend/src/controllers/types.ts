@@ -16,6 +16,12 @@ export interface LoginBody extends Request{
 }
 
 export interface UserRequest extends Request {
-    userId: string,
-    // wordLength: string,
+    userId:string,
+    wordLength:string,
+    word:string,
+    guesses:string[],
+    correctGuesses:string[],
+    incorrectGuesses:string[],
+    remainingGuesses:number,
+    isActive:boolean,
 }
