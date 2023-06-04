@@ -1,6 +1,7 @@
 import { User } from "../models/user";
 import { ConflictError, UnauthorizedError } from "../errors/http_error";
 import { LoginCredentials, SignupCredentials } from "../components/types";
+import { Game } from "../models/game";
 
 
 async function fetchData(input: RequestInfo, init?: RequestInit){
@@ -28,6 +29,22 @@ async function fetchData(input: RequestInfo, init?: RequestInit){
 
 }
 
+// Get game
+
+export async function fetchGames(wordLength:number): Promise<Game>{
+
+    const token = localStorage.getItem("token");
+    const response = await fetchData(`/api/games/${wordLength}`,{
+        method: 'GET',
+        headers: {
+         "Authorization": `Bearer ${token}`, 
+         "Content-Type": "application/json",
+        },
+      });
+      const data = response.json();
+      return data;
+
+}
 // Get logged in user
 export async function getLoggedInUser():Promise<User>{
 

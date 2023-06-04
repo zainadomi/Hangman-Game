@@ -8,6 +8,8 @@ import Figure from "../components/Figure";
 import Word from "../components/Word";
 import WrongLetters from "../components/WrongLetters";
 import {Game as GameModel} from '../models/game'
+import * as GamesApi from "../network/api";
+
 
 
 interface RouteParams {
@@ -15,7 +17,10 @@ interface RouteParams {
 }
 
 export default function GamePage({ loggedInUser }: HomePageProps) {
-  
+  const [game, setGame] = useState<GameModel[]>([]);
+  const [gameLodading, setGameLoading] = useState(true);
+  const [showGameLoadingError, setShowGameLoadingError] = useState(false);
+
   const { wordLength } = useParams() as unknown as RouteParams;
   const wordLengthVal = parseInt(wordLength);
   const [randomWord, setRandomWord] = useState([]);
@@ -24,45 +29,31 @@ export default function GamePage({ loggedInUser }: HomePageProps) {
   const [wrongLetters, setWrongLetters] = useState([]);
   // const [showNotification, setShowNotification] = useState(false);
 
-  const API_URL = `http://api.datamuse.com/words?sp=${"?".repeat(wordLengthVal)}&max=1000`;
 
 //   interface GameProps{
 //     game: GameModel
 // }
 
-//   const Game = ({game}:GameProps) =>{
-//     const {
-//         word,
-//         wordLength,
-//         correctGuesses,
-//         incorrectGuesses,
-//         guesses,
-//         remainingGuesses,
-//         isActive,
-//     } = game;
-// }
+
 
 // move it to backebd
-  const generateRandomWord = async () => {
-    try {
-      const response = await fetch(API_URL);
-      if (response.ok) {
-        const data = await response.json();
-        const randomIndex = Math.floor(Math.random() * data.length);
-        const randomWord = data[randomIndex].word; // Access the word property of the randomly selected index
-        setRandomWord(randomWord);
-        console.log(randomWord);
-      } else {
-        throw new Error("Failed to fetch random word");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const loadGame = async () => {
 
-  useEffect(() => {
-    generateRandomWord();
-  }, []);
+  try {
+    setShowGameLoadingError(false);
+    setGameLoading(true);
+    const game = await GamesApi.fetchGames();
+    setGame(game);
+  } catch (error) {
+    console.error(error);
+    setShowGameLoadingError(true);
+  } finally {
+    setGameLoading(false);
+  }
+}
+useEffect(() => {
+  loadGame();
+}, []);
 
 
   useEffect(() => {
