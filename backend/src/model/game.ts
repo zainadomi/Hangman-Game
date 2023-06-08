@@ -5,11 +5,13 @@ const gameSchema  = new Schema({
     userId:{type: Schema.Types.ObjectId, required:true},
     wordLength:{type:String,required:true},
     word:{type:String,required:true},
-    guesses:{type:String,}, // everything
+    letter:{type:String},
+    currentWord:{type:[String],default:[]},
+    guesses:{type:[String],}, // everything
     correctGuesses:{type: [String]},// array 
     incorrectGuesses:{type: [String]}, // array     
-    remainingGuesses:{type: Number,default:5},
-    isActive:{type: Boolean},
+    remainingGuesses:{type: Number,default:10},
+    isActive:{type: Boolean, default:true},
 });
 
 type Game = InferSchemaType<typeof gameSchema>;

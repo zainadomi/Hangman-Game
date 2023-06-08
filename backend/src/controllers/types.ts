@@ -20,6 +20,7 @@ export interface UserRequest extends Request {
     wordLength:string,
     word:string,
     guesses:string[],
+    currentWord:string[],
     correctGuesses:string[],
     incorrectGuesses:string[],
     remainingGuesses:number,

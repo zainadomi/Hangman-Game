@@ -4,11 +4,11 @@ import * as  GameController from '../controllers/games'
 
 const router = express.Router();
 
-// router.get('/:gameId',verifyToken, GameController.getGame);
+router.get('/',verifyToken, GameController.getGame); // /getGame/:gameId
 // router.get('/:id',verifyToken, GameController.getGame);
 // router.post('/',verifyToken, GameController.createGame);
-router.post('/:wordLength', GameController.createGame);
-router.post('/:letter', GameController.guessLetter);
+router.post('/:wordLength',verifyToken, GameController.createGame);
+router.post('/guessLetter/game/:gameId', GameController.guessLetter);
 
 
 

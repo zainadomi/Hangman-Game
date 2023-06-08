@@ -31,25 +31,19 @@ import { generateWord } from '../network/word';
 
 export const getGame: any = async (req:UserRequest,res:Response,next:NextFunction) => {
 
-    const gameId = req.params.gameId;
+    // const gameId = req.params.gameId;
     const authenticatedUserId = req.userId;
 
-
     try{
+       assertIsDefined(authenticatedUserId); 
 
-        assertIsDefined(authenticatedUserId);
-         
-        if(!mongoose.isValidObjectId(gameId)){
-            throw createHttpError(400,'Invalid game id');
-        }
-        const game = await GameModel.findById(gameId).exec();
+    //    if(!mongoose.isValidObjectId(gameId)){
+    //         throw createHttpError(400,'Invalid game id');
+    //     }
+        const game = await GameModel.find({userId:authenticatedUserId,isActive:true}).exec();
 
         if(!game){
             throw createHttpError(404,'Game not found');
-        }
-
-        if(!game.userId.equals(authenticatedUserId)){
-            throw createHttpError(401,"You can't access this game")
         }
 
         res.status(200).json(game);
@@ -78,14 +72,12 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
                 userId:authenticatedUserId,
                 wordLength:wordLength,
                 word:word,
+                currentWord:new Array(wordLength).fill(''),
                 guesses:[],
-                // correctGuesses:[],
-                // incorrectGuesses:[],
-                // remainingGuesses:5,
-                // isActive:true,
+               
         });
 
-        res.status(201).json(newGame.word); 
+        res.status(201).json(newGame); // .word
 
     }catch(error){
         next(error);
@@ -95,32 +87,101 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
 // Guess letter 
 
 export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunction) => {
+ 
+    // function replaceLetterAtIndex(word: string, index: number, newLetter: string): string {
+    //     const wordArray = Array.from(word); 
+    //     wordArray[index] = newLetter; 
+    //     return wordArray.join(''); 
+    //   }
 
-    const {letter,id} = req.body;
+    // const {letter,id, isActive} = req.body;
     
+    // try {
+    //     const game = await GameModel.findById(id, isActive.true).exec();
+    //     if (!game) {
+    //       throw createHttpError("Game not found");
+    //     }
+    //     let word = game.word;
+    
+    //     const isLetterInWord = word.includes(letter);
+    //     console.log(`Is letter "${letter}" in the word? ${isLetterInWord}`);
+    
+    //     if (isLetterInWord) {
+    //       const indices = [];
+    //       for (let i = 0; i < word.length; i++) {
+    //         if (word[i] === letter) {
+    //           indices.push(i);
+    //         }
+    //       }
+    
+    //       for (const index of indices) {
+    //         word = replaceLetterAtIndex(word, index, letter);
+    //       } // don't need it
+    //     }
+    
+    //     console.log(`Updated word: ${word}`);
+    // }catch(error){
+    //     next(error);
+    // }
+    // new finction 
+
+    const gameId = req.params.gameId;
+    const letter = req.body.letter;  
+    const authenticatedUserId = req.userId;
+
+
     try{
 
-        const game = await GameModel.findById(id).exec();
+        assertIsDefined(authenticatedUserId);
+
+        if(!mongoose.isValidObjectId(gameId)){
+            throw createHttpError(400,'Invalid game id');
+        }
+
+        if (!letter){
+            throw createHttpError(400,'You must enter a letter')
+        }
+
+        const game = await GameModel.findById(gameId).exec();
+
         if(!game){
-            throw createHttpError("Game not found");
+            throw createHttpError("Game not Found");
         }
-        const word = game.word;
-        const index = word.indexOf(letter);
-        if (index == -1){
+
+        if(!game.userId.equals(authenticatedUserId)){
+            throw createHttpError(401,"You can't access this game")
+        }
+
+        let isWon = false;
+
+                game.guesses.push(letter);
+                game.isActive = game.remainingGuesses === 0 ? false : true;
+                console.log(game.word)
+                console.log(letter)
+
+
+
+         if(game.word.toLocaleLowerCase().includes(letter?.toLocaleLowerCase())){
+                   game.correctGuesses.push(letter)
+                   for (let i = 0; i < game.word.length; i++) {
+                        if (game.word[i] === letter) {
+                          game.currentWord[i]= letter;
+
+                        } 
+                      }
+                      console.log('----------' + game.currentWord)
+
+
+                    } else {
+            game.remainingGuesses = game.remainingGuesses - 1;
             game.incorrectGuesses.push(letter);
-            game.remainingGuesses--;
-        }else {
-            game.correctGuesses.push(letter);
-            const gameStatus = await game.save();
-            const gameOver = gameStatus.remainingGuesses == 0;
-            const winGame = gameStatus.correctGuesses.length == word.length;
-            res.status(201).json({
-                letter:letter,
-                winGame:winGame,
-                gameOver:gameOver,
-            });
         }
+        isWon = !game.isActive && game.correctGuesses.length === game.word.length;
+        await game.save();
+        res.json({ isWon, game });
+
+    
     }catch(error){
-        next(error);
+        console.error(error)
     }
 }
