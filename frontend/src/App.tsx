@@ -11,7 +11,7 @@ import GamePage from "./pages/GamePage";
 import HomePage from "./pages/HomePage";
 
 
-function App() {
+function App(){
 
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [showSignUpModel, setShowSignUpModel] = useState(false);
@@ -58,7 +58,7 @@ function App() {
               element={<HomePage loggedInUser={loggedInUser} />}
             />
 
-            <Route 
+            <Route  
             path="/gamepage/:wordLength"
              element={<GamePage loggedInUser={loggedInUser} />}
              />

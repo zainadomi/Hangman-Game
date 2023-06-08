@@ -3,6 +3,7 @@ export interface Game{
     wordLength:string,
     word:string,
     guesses:string[],
+    currentWord:string[],
     correctGuesses:string[],
     incorrectGuesses:string[],
     remainingGuesses:Number,

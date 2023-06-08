@@ -1,17 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button} from "react-bootstrap";
 import styleUtils from '../styles/utils.module.css';
 import { Link } from "react-router-dom";
+import {Game as GameModel} from '../models/game'
+import * as GamesApi from "../network/api";
+
+
 
 
 
 export default function StartGamePageLoggedInView() {
   const [wordLength,setWordLength] = useState();
+  const [game, setGame] = useState<GameModel[]>([]);
+
 
   function handleWordLength (event:any) {
     setWordLength(event.target.value)
     console.log(wordLength);
   }
+
+  async function startGame() {
+    try {
+      const game = await GamesApi.fetchGames(parseInt(wordLength!));
+      setGame(game);
+  
+    } catch (error) {
+      console.error(error);
+   
+    }
+  }
+
+  
   return (
     <>
     
@@ -27,9 +46,12 @@ export default function StartGamePageLoggedInView() {
             <option value="7">7</option>
           </select>
 
-           <Link to={`/gamepage/${wordLength}`}> <Button 
+           <Link to={`/gamepage/${wordLength}`}>
+            <Button 
            type="submit" 
-           className={styleUtils.buttonStyle}>   
+           className={styleUtils.buttonStyle}
+           onClick={startGame}
+           >   
             Start Game
            </Button></Link> 
          
