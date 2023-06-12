@@ -9,6 +9,7 @@ import LogInModal from "./components/LogInModal";
 import { Container } from "react-bootstrap";
 import GamePage from "./pages/GamePage";
 import HomePage from "./pages/HomePage";
+import StartGamePageLoggedInView from "./components/StartGamePageLoggedInView";
 
 
 function App(){
@@ -62,7 +63,10 @@ function App(){
             path="/gamepage/:wordLength"
              element={<GamePage loggedInUser={loggedInUser} />}
              />
-            
+            <Route
+              path="/startGame"
+              element={<StartGamePageLoggedInView />}
+            />
            
           </Routes>
         </Container>

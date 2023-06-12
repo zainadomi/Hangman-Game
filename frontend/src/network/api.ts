@@ -47,29 +47,35 @@ export async function fetchGames(wordLength:number): Promise<Game[]>{
 }
 // get current game 
 
-export async function getGame():Promise<Game[]>{
+export async function getGame():Promise<{ game: Game| null, word: string | null,gameId:string|null}>{
     const token = localStorage.getItem("token");
     const response = await fetchData('/api/games/' ,{
         method: 'GET',
         headers: {
          "Authorization": `Bearer ${token}`, 
-        //  "Content-Type": "application/json",
         },
       });
 
-      return response.json();
-}
+      const games = await response.json();
+      console.log(games);
+      const word = games.word;
+      const gameId = games.gameId;
+     return { game: games, word: word ,gameId:gameId};
+    }
 
 // guess letter 
 
 export async function guessLetter(gameId:string,letter:string): Promise<Game[]>{
     const token = localStorage.getItem("token");
     const response = await fetchData(`/api/games/guessLetter/game/${gameId}`,{
+
         method:'POST',
-        headers:{
+        headers:{ 
             "Authorization": `Bearer ${token}`, 
+            "Content-Type": "application/json", 
+
         },
-        body: JSON.stringify({ letter, id: gameId }),
+        body: JSON.stringify({ letter, gameId }),
 
     });
 
