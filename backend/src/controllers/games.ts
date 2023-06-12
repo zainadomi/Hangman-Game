@@ -8,30 +8,12 @@ import { generateWord } from '../network/word';
 
 
 
-// Get Game
-
-// import { NextFunction, Response } from "express";
-// import { assertIsDefined } from "../util/assertIsDefined";
-// import { UserRequest } from "./types";
-
-// export const getGame:any = async (req:UserRequest,res:Response,next:NextFunction)=>{
-//     const authenticatedUserId = req.userId;
-
-//     try {
-//         assertIsDefined(authenticatedUserId)
-//         const game = await GameModel.find({userId:authenticatedUserId}).exec();
-//         res.status(200).json(game);
-//     } catch (error) {
-//         next(error)
-//     }
-// } 
 
 // Get the Game 
 
 
 export const getGame: any = async (req:UserRequest,res:Response,next:NextFunction) => {
 
-    // const gameId = req.params.gameId;
     const authenticatedUserId = req.userId;
 
     try{
@@ -40,13 +22,15 @@ export const getGame: any = async (req:UserRequest,res:Response,next:NextFunctio
     //    if(!mongoose.isValidObjectId(gameId)){
     //         throw createHttpError(400,'Invalid game id');
     //     }
-        const game = await GameModel.find({userId:authenticatedUserId,isActive:true}).exec();
-
+    
+        const game = await GameModel.findOne({userId:authenticatedUserId,isActive:true}).exec();
         if(!game){
             throw createHttpError(404,'Game not found');
         }
-
-        res.status(200).json(game);
+        const word = game.word;
+        const gameId = game.id;
+        const gameWithWordAndId = { game, word ,gameId };
+        res.status(200).json(gameWithWordAndId);
     }catch(error){
         next(error )
      
@@ -60,7 +44,6 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
     const wordLength = req.params.wordLength;
     const authenticatedUserId = req.userId;
     const word = await generateWord(parseInt(wordLength));
-    
     try{
 
         assertIsDefined(authenticatedUserId);
@@ -68,7 +51,12 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
             throw createHttpError(400, 'You must select a wordLength')
         }
 
-        const newGame = await GameModel.create({
+        const currentGame = await GameModel.findOne({userId:authenticatedUserId,isActive:true})
+    
+        if(currentGame){
+            res.json('you can\'t start new game');
+        }else{
+            const newGame = await GameModel.create({
                 userId:authenticatedUserId,
                 wordLength:wordLength,
                 word:word,
@@ -76,8 +64,8 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
                 guesses:[],
                
         });
-
-        res.status(201).json(newGame); // .word
+        res.status(201).json(newGame);
+        }
 
     }catch(error){
         next(error);
@@ -88,43 +76,6 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
 
 export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunction) => {
  
-    // function replaceLetterAtIndex(word: string, index: number, newLetter: string): string {
-    //     const wordArray = Array.from(word); 
-    //     wordArray[index] = newLetter; 
-    //     return wordArray.join(''); 
-    //   }
-
-    // const {letter,id, isActive} = req.body;
-    
-    // try {
-    //     const game = await GameModel.findById(id, isActive.true).exec();
-    //     if (!game) {
-    //       throw createHttpError("Game not found");
-    //     }
-    //     let word = game.word;
-    
-    //     const isLetterInWord = word.includes(letter);
-    //     console.log(`Is letter "${letter}" in the word? ${isLetterInWord}`);
-    
-    //     if (isLetterInWord) {
-    //       const indices = [];
-    //       for (let i = 0; i < word.length; i++) {
-    //         if (word[i] === letter) {
-    //           indices.push(i);
-    //         }
-    //       }
-    
-    //       for (const index of indices) {
-    //         word = replaceLetterAtIndex(word, index, letter);
-    //       } // don't need it
-    //     }
-    
-    //     console.log(`Updated word: ${word}`);
-    // }catch(error){
-    //     next(error);
-    // }
-    // new finction 
-
     const gameId = req.params.gameId;
     const letter = req.body.letter;  
     const authenticatedUserId = req.userId;
@@ -159,8 +110,6 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
                 console.log(game.word)
                 console.log(letter)
 
-
-
          if(game.word.toLocaleLowerCase().includes(letter?.toLocaleLowerCase())){
                    game.correctGuesses.push(letter)
                    for (let i = 0; i < game.word.length; i++) {
@@ -176,6 +125,8 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
             game.remainingGuesses = game.remainingGuesses - 1;
             game.incorrectGuesses.push(letter);
         }
+        game.remainingGuesses === 0 ? game.isActive = false :game.isActive = true
+        game.isActive = game.correctGuesses.length === game.word.length?false:true;     
         isWon = !game.isActive && game.correctGuesses.length === game.word.length;
         await game.save();
         res.json({ isWon, game });
