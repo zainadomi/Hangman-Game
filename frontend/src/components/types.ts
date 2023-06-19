@@ -20,18 +20,16 @@ export interface NavBarLoggedInViewProps{
 }
 
 export interface SignupCredentials{
-    usename: string,
+    username: string,
     email: string,
     password: string,
 }
 
 export interface SignUpModalProps {
-    onDismiss: () => void;
     onSignUpSuccessful: (user: User) => void;
   }
 
 export interface LoginModalProps {
-    onDismiss: () => void;
     onLoginSuccsessful: (user: User) => void;
   }
 
@@ -44,3 +42,4 @@ export interface LoginModalProps {
   loggedInUser: User | null,
 }
 
+//            {(correctLetters).includes(letter)? letter : ''}  

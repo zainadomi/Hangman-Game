@@ -1,15 +1,18 @@
 import React from 'react'
-import { Button, Navbar } from 'react-bootstrap';
+import { Navbar } from 'react-bootstrap';
 import { NavBarLoggedInViewProps } from './types';
-import * as NotesApi from "../network/api";
+import * as GameApi from "../network/api";
 import { Link } from 'react-router-dom';
+import Button from '@mui/material/Button';
+
+
 
 
 const NavBarLoggedInView = ({user,onLoggedoutSuccessful}:NavBarLoggedInViewProps) => {
-   
+
     async function logout(){
         try {
-            await NotesApi.logout();
+            await GameApi.logout();
             onLoggedoutSuccessful()
             
             
@@ -21,10 +24,12 @@ const NavBarLoggedInView = ({user,onLoggedoutSuccessful}:NavBarLoggedInViewProps
     }
     return ( 
         <>
-        <Navbar.Text className="me-2" >
-            Signed in as: {user.username}
+        <Navbar.Text className="me-3" style={{color:'white'}}>
+          Signed in as: {user.username} 
         </Navbar.Text>
-        <Link to={'/'}><Button className='btn btn-dark' onClick={logout}>Log out</Button>
+        <Link to='/'>
+                <Button variant="text" style={{ color: 'white',textTransform: 'none'}} onClick={logout}>Log out</Button>
+
         </Link>
         </>
      );

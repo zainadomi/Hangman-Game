@@ -18,47 +18,87 @@ gap: 4px;
 
 .textColor{
     color: white;
-}
-
-.buttonStyle{
-    background-color: black;
-    border: none;
-    margin-top: 15px;
-    width: 100%;
-    color: white;
 
 }
 
 .buttonStyle:hover{
-    background-color: rgb(57, 57, 57);
+  background-color:#900390;
+  
+}
+.buttonStyle{
+  border: none;
+  width: 100% ;
+  margin-top: 5%;
+  background-color:purple;
+
+}
+
+.navBarbg{
+  background-color: purple;
+}
+
+.selectwordDiv{
+  height: 70%;
+  width: 30%;
+  background-color: white;
+  padding-top: 2%;
+  border: solid 2px purple;
+  padding:2%;
+}
+.gameTitle{
+  color:white;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-left: 40%;
+}
+
+.selectedWordLength{
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: purple;
+  margin-top: 30%;
+  margin-bottom: 6%;
+
 }
 
 
-
+.gameTitle:hover{
+  color: white;
+}
 
   .title{
 
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 2%;
+    color: purple;
+  }
+
+  .wrongGuesses{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-top: 6%;
+    color: purple;
   }
 
 
   .center{
     display: flex;
-    /* align-items: center; */
     justify-content: center;
     margin-top: 10px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   }
 
   
-
+.logoutButton{
+  background-color: purple;
+}
 
   .figureContainer {
   
     fill: transparent;
-    stroke: black;
+    stroke: purple;
     stroke-width: 4px;
     stroke-linecap: round;
     margin-top: 5%;
@@ -73,14 +113,14 @@ gap: 4px;
   .word {
     display: flex;
     position: absolute;
-    /* bottom: 10px; */
     left: 50%;
     transform: translateX(-50%);
+    color:purple;
     
   }
   
   .letter {
-    border-bottom: 3px solid #000000;
+    border-bottom: 3px solid purple;
     display: inline-flex;
     font-size: 30px;
     align-items: center;
@@ -93,16 +133,15 @@ gap: 4px;
 
   .gameContainer {
     padding: 20px 30px;
-      /* position: relative; */
-    margin: auto;
-    height: 350px;
+    margin: auto  ;
+    height: 100%;
     width: 700px;
+    margin-top: 10%;
+    border: solid 2px purple;
   }
 
   .wrongLettersContainer {
     position: absolute;
-    /* top: 15px; */
-    /* right: 20px; */
     display: flex;
     flex-direction: column;
     text-align: left;
@@ -116,32 +155,9 @@ gap: 4px;
   .wrongLettersContainer span {
     font-size: 24px;
   }
-
-
-  .notificationContainer {
-    background-color: rgba(41, 141, 213, 0.3);
-    border-radius: 10px 10px 10px 10px;
-    padding: 15px 20px;
-    /* position: absolute; */
-    /* align-items: center; */
-    width: 47%;
-    bottom: -50px;
-    transition: transform 0.3s ease-in-out;
-    margin-left: 28%;
-    margin-top: 16%;
-  }
   
-  .notificationContainer p {
-    margin: 0;
-  }
-  
-  .notificationContainer.show {
-    transform: translateY(-50px);
-  }
- 
-
   .startAgain {
-    background-color: black;
+    background-color: purple;
     border: none;
     margin-top: 50px;
     margin-bottom: 0px;
@@ -154,6 +170,6 @@ gap: 4px;
   }
 
   .startAgain:hover{
-    background-color: rgb(57, 57, 57);
+    background-color:#900390;
 
   }

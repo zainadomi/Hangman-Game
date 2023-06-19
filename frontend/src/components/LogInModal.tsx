@@ -1,84 +1,156 @@
 import { useForm } from "react-hook-form";
-import * as NotesApi from "../network/api";
-import { Alert, Button, Form, Modal } from "react-bootstrap";
-import TextInputField from "./TextInputField";
-import styleUtils from "../styles/utils.module.css";
+import * as GameApi from "../network/api";
 import { useState } from "react";
 import { UnauthorizedError } from "../errors/http_error";
 import { LoginCredentials, LoginModalProps } from "./types";
+import { useNavigate } from "react-router-dom";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import styleUtils from '../styles/utils.module.css';
 
 
+import {
+  Avatar,
+  Box,
+  Checkbox,
+  Container,
+  CssBaseline,
+  FormControlLabel,
+  Grid,
+  Link,
+  TextField,
+  ThemeProvider,
+  Typography,
+  Button,
+  createTheme,
+} from "@mui/material";
 
-const LogInModal = ({ onDismiss, onLoginSuccsessful }: LoginModalProps) => {
+
+const LogInModal = ({ onLoginSuccsessful }: LoginModalProps) => {
   const [errorText, setErrorText] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const defaultTheme = createTheme();
+
 
   const {register,handleSubmit,formState: { errors, isSubmitting }} = useForm<LoginCredentials>();
 
   async function onSubmit(credentials: LoginCredentials) {
-   
     try {
-      const response = await NotesApi.login(credentials);
+      const response = await GameApi.login(credentials);
       onLoginSuccsessful(response);
-
+      try {
+        const game = await GameApi.getGame();
+        if(game){
+          const wordLength = game.wordLength;
+          navigate(`/gamepage/${wordLength}`);
+        }
+      }catch(errror){
+        navigate("/startGame");
+      }
+    
     } catch (error) {
-
       if (error instanceof UnauthorizedError) {
         setErrorText(error.message);
-      }
-
-      else{
+      } else {
         alert(error);
       }
-
       console.error(error);
     }
   }
+
   return (
 
 
-    <Modal show onHide={onDismiss}>
-      <Modal.Header closeButton>
-        <Modal.Title>Log In</Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-
-        {errorText && 
-        <Alert variant="danger">
-          {errorText}
-        </Alert>
-        }
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <TextInputField
-            name="username"
+    <ThemeProvider theme={defaultTheme}>
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign In
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ mt: 1 }}
+        >
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
             label="Username"
-            type="text"
-            placeholde="Username"
-            register={register}
-            registerOptions={{ required: "Required" }}
-            error={errors.username}
+            autoComplete="username"
+            autoFocus
+            {...register("username")}
+            error={!!errors.username}
+            helperText={errors.username?.message}
+            sx={{
+              "& .MuiOutlinedInput-root.Mui-focused ": {
+                "& > fieldset": {
+                borderColor: "purple",
+                }
+              },"& .MuiInputLabel-root.Mui-focused": {color: 'purple'}
+            }}
           />
-
-          <TextInputField
-            name="password"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             label="Password"
             type="password"
-            placeholde="Password"
-            register={register}
-            registerOptions={{ required: "Required" }}
-            error={errors.password}
+            id="password"
+            autoComplete="current-password"
+            {...register("password")}
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            sx={{
+              "& .MuiOutlinedInput-root.Mui-focused ": {
+                "& > fieldset": {
+                borderColor: "purple",
+                }
+              },"& .MuiInputLabel-root.Mui-focused": {color: 'purple'}
+            }}
           />
-
-          <Button
+          <FormControlLabel
+            control={<Checkbox value="remember" color="primary" />}
+            label="Remember me"
+          />
+         
+          <Button className={styleUtils.buttonStyle}
             type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: {backgroundColor:'purple',color:'white',":hover":{
+              backgroundColor:'#900390'
+            }}}
+          }
             disabled={isSubmitting}
-            className={styleUtils.width100}
           >
-            Log In
+           Sign In 
           </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+     
+          
+          <Grid container>
+            <Grid item>
+              <Link href="/SignUpModal" variant="body2" style={{color:'purple',textDecoration: 'none'}}>
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </Container>
+  </ThemeProvider>
   );
 }; 
 

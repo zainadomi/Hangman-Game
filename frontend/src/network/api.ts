@@ -4,7 +4,9 @@ import { LoginCredentials, SignupCredentials } from "../components/types";
 import { Game } from "../models/game";
 
 
+
 async function fetchData(input: RequestInfo, init?: RequestInit){
+
     const response = await fetch(input, init);
 
     if (response.ok){
@@ -41,13 +43,18 @@ export async function fetchGames(wordLength:number): Promise<Game[]>{
         //  "Content-Type": "application/json",
         },
       });
+      if(!wordLength){
+        alert('please select word length')
+      }
 
       return response.json();
 
 }
 // get current game 
 
-export async function getGame():Promise<{ game: Game| null, word: string | null,gameId:string|null}>{
+
+export async function getGame():Promise<{ game: Game| null, wordLength: number| null,gameId:string|null,correctGuesses:string[],incorrectGuesses:string[],shownWord:string[]}>{
+
     const token = localStorage.getItem("token");
     const response = await fetchData('/api/games/' ,{
         method: 'GET',
@@ -55,17 +62,25 @@ export async function getGame():Promise<{ game: Game| null, word: string | null,
          "Authorization": `Bearer ${token}`, 
         },
       });
-
+      if (!response.ok) {
+        // Handle the case where there is no response or an error
+        throw new Error("There was an error retrieving the game data");
+        
+      }
       const games = await response.json();
       console.log(games);
-      const word = games.word;
+      const wordLength = games.wordLength;
       const gameId = games.gameId;
-     return { game: games, word: word ,gameId:gameId};
+      const correctGuesses = games.correctGuesses;
+      const incorrectGuesses = games.incorrectGuesses;
+      const shownWord = games.shownWord;
+      
+     return { game: games, wordLength: wordLength ,gameId:gameId ,correctGuesses:correctGuesses,incorrectGuesses:incorrectGuesses,shownWord:shownWord};
     }
 
 // guess letter 
 
-export async function guessLetter(gameId:string,letter:string): Promise<Game[]>{
+export async function guessLetter(gameId: string, letter: string): Promise<{ shownWord: string[], incorrectGuesses: string[],correctGuesses:string[],isWon:boolean}> {
     const token = localStorage.getItem("token");
     const response = await fetchData(`/api/games/guessLetter/game/${gameId}`,{
 
@@ -78,8 +93,9 @@ export async function guessLetter(gameId:string,letter:string): Promise<Game[]>{
         body: JSON.stringify({ letter, gameId }),
 
     });
+    const { shownWord, incorrectGuesses ,correctGuesses ,isWon} = await response.json();
 
-    return response.json();
+  return { shownWord, incorrectGuesses,correctGuesses ,isWon};
 
 
 }
@@ -135,7 +151,6 @@ export async function login(credentials: LoginCredentials):Promise<User>{
 
       localStorage.setItem("token", data.token);
       alert(`Login Successful, the user now is: ${credentials.username}`);
-      console.log("--------------------");
       console.log(localStorage.getItem("token"));
     
     } else {
@@ -154,4 +169,3 @@ export async function logout(){
         method:'POST',
     });
  }
-
