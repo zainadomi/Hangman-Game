@@ -17,20 +17,21 @@ export const getGame: any = async (req:UserRequest,res:Response,next:NextFunctio
     const authenticatedUserId = req.userId;
 
     try{
+        
        assertIsDefined(authenticatedUserId); 
 
-    //    if(!mongoose.isValidObjectId(gameId)){
-    //         throw createHttpError(400,'Invalid game id');
-    //     }
-    
         const game = await GameModel.findOne({userId:authenticatedUserId,isActive:true}).exec();
+
         if(!game){
             throw createHttpError(404,'Game not found');
         }
-        const word = game.word;
+        const wordLength = game.wordLength;
         const gameId = game.id;
-        const gameWithWordAndId = { game, word ,gameId };
-        res.status(200).json(gameWithWordAndId);
+        const correctGuesses = game.correctGuesses;
+        const incorrectGuesses = game.incorrectGuesses;
+        const shownWord = game.shownWord;
+        const gameData= { game, wordLength ,gameId , correctGuesses,incorrectGuesses, shownWord};
+        res.status(200).json(gameData);
     }catch(error){
         next(error )
      
@@ -81,6 +82,7 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
     const authenticatedUserId = req.userId;
 
 
+
     try{
 
         assertIsDefined(authenticatedUserId);
@@ -105,31 +107,34 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
 
         let isWon = false;
 
-                game.guesses.push(letter);
-                game.isActive = game.remainingGuesses === 0 ? false : true;
-                console.log(game.word)
-                console.log(letter)
+          game.guesses.push(letter);
+          game.isActive = game.remainingGuesses === 0 ? false : true;
+                
 
          if(game.word.toLocaleLowerCase().includes(letter?.toLocaleLowerCase())){
                    game.correctGuesses.push(letter)
-                   for (let i = 0; i < game.word.length; i++) {
+                   for (let i = 0; i < game.wordLength; i++) {
                         if (game.word[i] === letter) {
-                          game.currentWord[i]= letter;
+                          game.shownWord[i]= letter;
+                        }
+                    }
 
-                        } 
-                      }
-                      console.log('----------' + game.currentWord)
-
-
-                    } else {
+          } else {
             game.remainingGuesses = game.remainingGuesses - 1;
             game.incorrectGuesses.push(letter);
         }
-        game.remainingGuesses === 0 ? game.isActive = false :game.isActive = true
-        game.isActive = game.correctGuesses.length === game.word.length?false:true;     
-        isWon = !game.isActive && game.correctGuesses.length === game.word.length;
+
+        const filteredShownWord = game.shownWord.filter((value) => value !== null )
+        console.log('shown ' + game.shownWord.length)
+        console.log('filtered '+ filteredShownWord.length)
+        game.isActive = filteredShownWord.length === game.wordLength || game.remainingGuesses === 0 ?false:true;     
+        isWon = !game.isActive && filteredShownWord.length === game.wordLength;
+        const shownWord = game.shownWord
+        const incorrectGuesses = game.incorrectGuesses;
+        const correctGuesses = game.correctGuesses
+
         await game.save();
-        res.json({ isWon, game });
+        res.json({ isWon,shownWord,incorrectGuesses,correctGuesses});
 
     
     }catch(error){

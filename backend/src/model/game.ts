@@ -3,10 +3,10 @@ import {InferSchemaType, Schema,model} from "mongoose";
 const gameSchema  = new Schema({
 
     userId:{type: Schema.Types.ObjectId, required:true},
-    wordLength:{type:String,required:true},
+    wordLength:{type:Number,required:true},
     word:{type:String,required:true},
     letter:{type:String},
-    currentWord:{type:[String],default:[]},
+    shownWord:{type:[String],default:[]},
     guesses:{type:[String],}, // everything
     correctGuesses:{type: [String]},// array 
     incorrectGuesses:{type: [String]}, // array     
