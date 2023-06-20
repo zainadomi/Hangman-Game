@@ -7,9 +7,9 @@ const gameSchema  = new Schema({
     word:{type:String,required:true},
     letter:{type:String},
     shownWord:{type:[String],default:[]},
-    guesses:{type:[String],}, // everything
-    correctGuesses:{type: [String]},// array 
-    incorrectGuesses:{type: [String]}, // array     
+    guesses:{type:[String],}, 
+    correctGuesses:{type: [String]},
+    incorrectGuesses:{type: [String]},     
     remainingGuesses:{type: Number,default:10},
     isActive:{type: Boolean, default:true},
 });

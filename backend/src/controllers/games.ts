@@ -11,7 +11,6 @@ import { generateWord } from '../network/word';
 
 // Get the Game 
 
-
 export const getGame: any = async (req:UserRequest,res:Response,next:NextFunction) => {
 
     const authenticatedUserId = req.userId;
@@ -127,7 +126,7 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
        
         game.isActive = game.correctGuesses.length === game.wordLength || game.remainingGuesses === 0 ?false:true;     
         isWon = game.correctGuesses.length === game.wordLength;
-        
+
         const shownWord = game.shownWord
         const incorrectGuesses = game.incorrectGuesses;
         const correctGuesses = game.correctGuesses
