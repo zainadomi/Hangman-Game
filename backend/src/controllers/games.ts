@@ -124,11 +124,10 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
             game.incorrectGuesses.push(letter);
         }
 
-        const filteredShownWord = game.shownWord.filter((value) => value !== null )
-        console.log('shown ' + game.shownWord.length)
-        console.log('filtered '+ filteredShownWord.length)
-        game.isActive = filteredShownWord.length === game.wordLength || game.remainingGuesses === 0 ?false:true;     
-        isWon = !game.isActive && filteredShownWord.length === game.wordLength;
+       
+        game.isActive = game.correctGuesses.length === game.wordLength || game.remainingGuesses === 0 ?false:true;     
+        isWon = game.correctGuesses.length === game.wordLength;
+        
         const shownWord = game.shownWord
         const incorrectGuesses = game.incorrectGuesses;
         const correctGuesses = game.correctGuesses
