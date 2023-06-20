@@ -42,4 +42,3 @@ export interface LoginModalProps {
   loggedInUser: User | null,
 }
 
-//            {(correctLetters).includes(letter)? letter : ''}  

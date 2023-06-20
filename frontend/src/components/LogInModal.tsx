@@ -6,8 +6,6 @@ import { LoginCredentials, LoginModalProps } from "./types";
 import { useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import styleUtils from '../styles/utils.module.css';
-
-
 import {
   Avatar,
   Box,

@@ -52,7 +52,6 @@ export async function fetchGames(wordLength:number): Promise<Game[]>{
 }
 // get current game 
 
-
 export async function getGame():Promise<{ game: Game| null, wordLength: number| null,gameId:string|null,correctGuesses:string[],incorrectGuesses:string[],shownWord:string[]}>{
 
     const token = localStorage.getItem("token");
