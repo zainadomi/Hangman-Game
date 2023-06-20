@@ -57,7 +57,6 @@ import {Game as GameModel} from '../models/game'
         setWrongLetters(response.incorrectGuesses)
         setCorrectLetters(response.correctGuesses)
         setIsWon(response.isWon)
-        console.log("shown Word = " + response.shownWord)
         return response;
         
       } catch (error) {

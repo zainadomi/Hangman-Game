@@ -67,7 +67,6 @@ export async function getGame():Promise<{ game: Game| null, wordLength: number| 
         
       }
       const games = await response.json();
-      console.log(games);
       const wordLength = games.wordLength;
       const gameId = games.gameId;
       const correctGuesses = games.correctGuesses;
@@ -144,13 +143,10 @@ export async function login(credentials: LoginCredentials):Promise<User>{
 
     const data = await response.json();
 
-    console.log(data);
-
     if (data.token) {
 
       localStorage.setItem("token", data.token);
       alert(`Login Successful, the user now is: ${credentials.username}`);
-      console.log(localStorage.getItem("token"));
     
     } else {
       alert("Please check your email and password");

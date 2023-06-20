@@ -18,11 +18,9 @@ import {
   ThemeProvider,
   Typography,
   Button,
-  createTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const defaultTheme = createTheme();
 const SignUpModal = ({ onSignUpSuccessful }: SignUpModalProps) => {
   const [errorText, setErrorText] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -49,7 +47,6 @@ const SignUpModal = ({ onSignUpSuccessful }: SignUpModalProps) => {
   }
 
   return (
-    <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -161,7 +158,6 @@ const SignUpModal = ({ onSignUpSuccessful }: SignUpModalProps) => {
           </Box>
         </Box>
       </Container>
-    </ThemeProvider>
   );
 };
 export default SignUpModal;

@@ -16,17 +16,14 @@ import {
   Grid,
   Link,
   TextField,
-  ThemeProvider,
   Typography,
   Button,
-  createTheme,
 } from "@mui/material";
 
 
 const LogInModal = ({ onLoginSuccsessful }: LoginModalProps) => {
   const [errorText, setErrorText] = useState<string | null>(null);
   const navigate = useNavigate();
-  const defaultTheme = createTheme();
 
 
   const {register,handleSubmit,formState: { errors, isSubmitting }} = useForm<LoginCredentials>();
@@ -58,7 +55,6 @@ const LogInModal = ({ onLoginSuccsessful }: LoginModalProps) => {
   return (
 
 
-    <ThemeProvider theme={defaultTheme}>
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <Box
@@ -148,7 +144,7 @@ const LogInModal = ({ onLoginSuccsessful }: LoginModalProps) => {
         </Box>
       </Box>
     </Container>
-  </ThemeProvider>
+  
   );
 }; 
 

@@ -9,11 +9,14 @@ import LogInModal from "./components/LogInModal";
 import { Container } from "react-bootstrap";
 import GamePage from "./pages/GamePage";
 import StartGamePageLoggedInView from "./components/StartGamePageLoggedInView";
+import { ThemeProvider } from 'styled-components';
+import { createTheme } from "@mui/system";
+
 
 
 
 function App(){
-
+  const defaultTheme = createTheme();
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null); 
 
   const fetchLoggedInUser = async ()=> {
@@ -38,7 +41,8 @@ function App(){
   
 
   return (
-   <BrowserRouter>
+    <ThemeProvider theme={defaultTheme}>
+      <BrowserRouter>
       <div>
         <NavBar
           loggedInUser={loggedInUser}
@@ -82,7 +86,9 @@ function App(){
           </Routes>
         </Container>
       </div>
-    </BrowserRouter>
+       </BrowserRouter>
+    </ThemeProvider>
+  
   );
 }
 
