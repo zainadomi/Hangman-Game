@@ -9,7 +9,9 @@ import { generateWord } from '../network/word';
 
 
 
+
 // Get the Game 
+
 
 export const getGame: any = async (req:UserRequest,res:Response,next:NextFunction) => {
 
@@ -24,13 +26,32 @@ export const getGame: any = async (req:UserRequest,res:Response,next:NextFunctio
         if(!game){
             throw createHttpError(404,'Game not found');
         }
+    
+           const currentTime = new Date().getTime();
+           const elapsedTimeInSeconds = Math.floor((currentTime - game.gameTime.getTime()) / 1000);
+           const remainingTimeInSeconds = 30 - elapsedTimeInSeconds;
+           game.gameTime = new Date(currentTime);
+       
+           if (remainingTimeInSeconds <= 0) {
+             game.isActive = false;
+           }else{
+            game.isActive = true;
+           }
+       
+           await game.save(); 
+
         const wordLength = game.wordLength;
         const gameId = game.id;
         const correctGuesses = game.correctGuesses;
         const incorrectGuesses = game.incorrectGuesses;
         const shownWord = game.shownWord;
-        const gameData= { game, wordLength ,gameId , correctGuesses,incorrectGuesses, shownWord};
+        const isActive = game.isActive;
+        const getTime = game.gameTime;
+        
+        const gameData= { game, wordLength ,gameId , correctGuesses,incorrectGuesses, shownWord,isActive, getTime};
         res.status(200).json(gameData);
+
+        
     }catch(error){
         next(error )
      
@@ -62,6 +83,8 @@ export const createGame:any = async (req:UserRequest,res:Response,next:NextFunct
                 word:word,
                 currentWord:new Array(wordLength).fill(''),
                 guesses:[],
+                gameTime:Date.now() + 3000,
+                
                
         });
         res.status(201).json(newGame);
@@ -126,7 +149,7 @@ export const guessLetter:any = async (req:UserRequest,res:Response,next:NextFunc
        
         game.isActive = game.correctGuesses.length === game.wordLength || game.remainingGuesses === 0 ?false:true;     
         isWon = game.correctGuesses.length === game.wordLength;
-
+        
         const shownWord = game.shownWord
         const incorrectGuesses = game.incorrectGuesses;
         const correctGuesses = game.correctGuesses

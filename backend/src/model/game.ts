@@ -12,6 +12,7 @@ const gameSchema  = new Schema({
     incorrectGuesses:{type: [String]},     
     remainingGuesses:{type: Number,default:10},
     isActive:{type: Boolean, default:true},
+    gameTime: { type: Date, default: Date.now() + 3000 } 
 });
 
 type Game = InferSchemaType<typeof gameSchema>;
