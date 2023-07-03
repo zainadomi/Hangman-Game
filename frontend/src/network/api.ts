@@ -52,7 +52,7 @@ export async function fetchGames(wordLength:number): Promise<Game[]>{
 }
 // get current game 
 
-export async function getGame():Promise<{ game: Game| null, wordLength: number| null,gameId:string|null,correctGuesses:string[],incorrectGuesses:string[],shownWord:string[]}>{
+export async function getGame():Promise<{ game: Game| null, wordLength: number| null,gameId:string|null,correctGuesses:string[],incorrectGuesses:string[],shownWord:string[],isActive:boolean,getTime:Date}>{
 
     const token = localStorage.getItem("token");
     const response = await fetchData('/api/games/' ,{
@@ -72,8 +72,10 @@ export async function getGame():Promise<{ game: Game| null, wordLength: number| 
       const correctGuesses = games.correctGuesses;
       const incorrectGuesses = games.incorrectGuesses;
       const shownWord = games.shownWord;
+      const isActive = games.isActive;
+      const getTime = games.getTime;
       
-     return { game: games, wordLength: wordLength ,gameId:gameId ,correctGuesses:correctGuesses,incorrectGuesses:incorrectGuesses,shownWord:shownWord};
+     return { game: games, wordLength: wordLength ,gameId:gameId ,correctGuesses:correctGuesses,incorrectGuesses:incorrectGuesses,shownWord:shownWord,isActive:isActive,getTime:getTime};
     }
 
 // guess letter 
@@ -155,7 +157,6 @@ export async function login(credentials: LoginCredentials):Promise<User>{
 }
 
 // Logout 
-
 export async function logout(){
 
     localStorage.clear();

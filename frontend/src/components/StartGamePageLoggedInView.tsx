@@ -4,11 +4,14 @@ import styleUtils from '../styles/utils.module.css';
 import { useNavigate } from "react-router-dom";
 import {Game as GameModel} from '../models/game'
 import * as GamesApi from "../network/api";
+import startGameSoundFile from '../sounds/startgame.wav';
+
 
 
 export default function StartGamePageLoggedInView() {
   const [wordLength,setWordLength] = useState();
   const [game, setGame] = useState<GameModel[]>([]);
+  const startGameSound = new Audio(startGameSoundFile);
   const navigate = useNavigate();
 
 
@@ -25,6 +28,7 @@ export default function StartGamePageLoggedInView() {
     try {
       const game = await GamesApi.fetchGames(parseInt(wordLength));
       setGame(game);
+      startGameSound.play();
       navigate(`/gamepage/${wordLength}`);
     } catch (error) {
       console.error(error);

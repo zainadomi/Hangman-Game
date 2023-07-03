@@ -8,6 +8,12 @@ import Word from "../components/Word";
 import WrongLetters from "../components/WrongLetters";
 import * as GamesApi from "../network/api";
 import {Game as GameModel} from '../models/game'
+// const  wrongGuessSound from '../sounds/wrong.mp3';
+    // const wrongGuessSound = new Audio("../sounds/wrong.mp3");
+import wrongGuessSoundFile from '../sounds/wrong.mp3';
+import gameOverSoundFile from '../sounds/gameover.wav'
+import selectSoundFile from '../sounds/select.wav';
+;
 
 
 
@@ -21,31 +27,37 @@ import {Game as GameModel} from '../models/game'
     const [shownWord, setShownWord] = useState<string[]>([]);
     const [game, setGame] = useState<GameModel| null>(null);
     const [wordLength, setWordLength] = useState<number| null>();
+    const [getTime, setGetTime] = useState<Date>();
+    const wrongGuessSound = new Audio(wrongGuessSoundFile);
+    const gameoverSound = new Audio(gameOverSoundFile);
+    const selectSound = new Audio(selectSoundFile);
     const [isWon, setIsWon] = useState(false);
-
-
     const [gameId, setGameId] = useState<string | null>(null);
     const navigate = useNavigate();
+
 
 
     const getGame = async () => {
 
       try {
-        const { game, wordLength ,gameId ,correctGuesses ,incorrectGuesses,shownWord} = await GamesApi.getGame();
+        const { game, wordLength ,gameId ,correctGuesses ,incorrectGuesses,shownWord,isActive,getTime} = await GamesApi.getGame();
         setGame(game);
         setWordLength(wordLength);
         setShownWord(shownWord)
         setGameId(gameId)
         setCorrectLetters(correctGuesses)
         setWrongLetters(incorrectGuesses)
+        setIsActive(isActive)
+        setGetTime(getTime)
       } catch (error) {
         console.error(error);
     }
   }
     useEffect(() => {
-    
         getGame();
       }, []);
+
+    
 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,20 +86,26 @@ import {Game as GameModel} from '../models/game'
               if (correctLetters.includes(letter)) {
                 setCorrectLetters((currentLetters) => [...currentLetters, letter]);
                 guessLetter(letter);
+                selectSound.play();
               } 
-              if (!wrongLetters.includes(letter)) {
+              else if (!wrongLetters.includes(letter)) {
                   setWrongLetters(currentLetters => [...currentLetters, letter]);
                   guessLetter(letter);
+                  wrongGuessSound.play();
   
               }
-              if(wrongLetters.length >= 10 || correctLetters.length === wordLength){
-                setIsActive(false)
-                navigate('/startGame')
+              if(wrongLetters.length >= 10|| correctLetters.length === wordLength){
+                setIsActive(false);
+                navigate('/startGame');
+             }
+
+             if(wrongLetters.length>=9){
+              gameoverSound.play();
              }
               
     
             }else {
-              console.log('Something went wrong')
+              alert('Something went wrong')
             }
           }else{
            alert('Game is over,start a new game')
@@ -98,7 +116,11 @@ import {Game as GameModel} from '../models/game'
         
         window.addEventListener('keydown', handleKeydown);
 
-        return () => window.removeEventListener('keydown', handleKeydown);
+        return () => 
+        window.removeEventListener('keydown', handleKeydown);
+        
+  
+
       }, [correctLetters, wrongLetters, isActive, gameId, game, guessLetter, navigate, wordLength,shownWord]);
 
 
@@ -110,10 +132,11 @@ import {Game as GameModel} from '../models/game'
 
     }
 
+
     return (
       <Container>
         <>
-          {loggedInUser && isActive ?  (
+          { isActive ?  (
             <>
               <div className={styleUtils.gameContainer}>
                 <h5 className={styleUtils.center} style={{color:'purple'}}>
@@ -143,7 +166,8 @@ import {Game as GameModel} from '../models/game'
               </div>
             </>
           ) : (
-            navigate('/')
+            navigate('/startGame')
+            
           )}
         </>
       </Container>
